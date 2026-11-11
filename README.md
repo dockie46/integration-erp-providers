@@ -27,6 +27,8 @@ from erp_providers import ErpProviders
 p = ErpProviders.discover()
 materials = p.read_materials("odoo", limit=50)
 materials = p.search_materials("cement", "odoo", limit=20)
+locations = p.read_locations(limit=20)
+stock = p.read_stock_quants(location_id="15", limit=50)
 users = p.read_users(limit=20)
 projects = p.read_projects(limit=20)
 partners = p.read_partners(limit=20)
@@ -52,6 +54,14 @@ Or env: `ODOO_URL`, `ODOO_DB`, `ODOO_LOGIN`, `ODOO_PASSWORD`
 
 ## Materials
 
-Read from Odoo `product.product` (active variants): code, barcode, category, UoM, price, stock qty.
+Read from Odoo `product.product` (active variants): code, barcode, category, UoM.
+Stock qty on the product is opt-in (slow); prefer `read_stock_quants` for location-aware qty.
 
-Based on the Odoo client used in Construction Diary Log, plus product/material reads.
+## Locations & stock (e-ink ready)
+
+- `read_locations` → Odoo `stock.location` (default `usage=internal`)
+- `read_stock_quants` → Odoo `stock.quant` (product × location × quantity)
+
+Based on the Odoo client used in Construction Diary Log, plus product/material and stock reads.
+
+

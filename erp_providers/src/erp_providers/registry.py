@@ -7,7 +7,14 @@ from pathlib import Path
 
 from .base import ErpProvider
 from .catalog import PROVIDER_TYPES
-from .models import MaterialItem, PartnerItem, ProjectItem, UserItem
+from .models import (
+    LocationItem,
+    MaterialItem,
+    PartnerItem,
+    ProjectItem,
+    StockQuantItem,
+    UserItem,
+)
 
 
 class ErpProviders:
@@ -97,4 +104,30 @@ class ErpProviders:
         items: list[MaterialItem] = []
         for provider in self._selected(provider_names):
             items.extend(provider.search_materials(query, limit=limit))
+        return items
+
+    def read_locations(
+        self, *provider_names: str, limit: int | None = 50
+    ) -> list[LocationItem]:
+        items: list[LocationItem] = []
+        for provider in self._selected(provider_names):
+            items.extend(provider.read_locations(limit=limit))
+        return items
+
+    def read_stock_quants(
+        self,
+        *provider_names: str,
+        location_id: str | None = None,
+        product_id: str | None = None,
+        limit: int | None = 50,
+    ) -> list[StockQuantItem]:
+        items: list[StockQuantItem] = []
+        for provider in self._selected(provider_names):
+            items.extend(
+                provider.read_stock_quants(
+                    location_id=location_id,
+                    product_id=product_id,
+                    limit=limit,
+                )
+            )
         return items

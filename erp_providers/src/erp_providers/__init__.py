@@ -1,13 +1,22 @@
 """ERP provider factory (Odoo, …)."""
 
-from .models import MaterialItem, PartnerItem, ProjectItem, UserItem
+from .models import (
+    LocationItem,
+    MaterialItem,
+    PartnerItem,
+    ProjectItem,
+    StockQuantItem,
+    UserItem,
+)
 from .registry import ErpProviders
 
 __all__ = [
     "ErpProviders",
+    "LocationItem",
     "MaterialItem",
     "PartnerItem",
     "ProjectItem",
+    "StockQuantItem",
     "UserItem",
 ]
 

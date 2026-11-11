@@ -7,7 +7,16 @@ from pathlib import Path
 from odoo_read import OdooClient, OdooCredentials, load_credentials
 from odoo_read.auth import OdooAuthError
 
-from .models import MaterialItem, PartnerItem, ProjectItem, UserItem, rel_id, rel_name
+from .models import (
+    LocationItem,
+    MaterialItem,
+    PartnerItem,
+    ProjectItem,
+    StockQuantItem,
+    UserItem,
+    rel_id,
+    rel_name,
+)
 
 
 class OdooProvider:
@@ -34,9 +43,7 @@ class OdooProvider:
         return cls(load_credentials(None))
 
     def read_users(self, limit: int | None = None) -> list[UserItem]:
-        rows = self._client.get_users()
-        if limit is not None:
-            rows = rows[:limit]
+        rows = self._client.get_users(limit=limit)
         return [
             UserItem(
                 provider=self.name,
@@ -91,6 +98,50 @@ class OdooProvider:
     def search_materials(self, query: str, *, limit: int = 20) -> list[MaterialItem]:
         rows = self._client.search_materials(query, limit=limit)
         return [_to_material(row) for row in rows]
+
+    def read_locations(self, limit: int | None = None) -> list[LocationItem]:
+        rows = self._client.get_locations(usage="internal", limit=limit)
+        return [
+            LocationItem(
+                provider=self.name,
+                id=str(row["id"]),
+                name=row.get("name") or "",
+                complete_name=row.get("complete_name") or "",
+                usage=row.get("usage") or "",
+                barcode=row.get("barcode") or "",
+                parent_id=str(pid) if (pid := rel_id(row.get("location_id"))) else None,
+                company=rel_name(row.get("company_id")),
+            )
+            for row in rows
+        ]
+
+    def read_stock_quants(
+        self,
+        *,
+        location_id: str | None = None,
+        product_id: str | None = None,
+        limit: int | None = None,
+    ) -> list[StockQuantItem]:
+        rows = self._client.get_stock_quants(
+            location_id=int(location_id) if location_id is not None else None,
+            product_id=int(product_id) if product_id is not None else None,
+            only_positive=True,
+            limit=limit,
+        )
+        return [
+            StockQuantItem(
+                provider=self.name,
+                id=str(row["id"]),
+                product_id=str(rel_id(row.get("product_id")) or ""),
+                product_name=rel_name(row.get("product_id")),
+                location_id=str(rel_id(row.get("location_id")) or ""),
+                location_name=rel_name(row.get("location_id")),
+                quantity=float(row.get("quantity") or 0),
+                reserved_quantity=float(row.get("reserved_quantity") or 0),
+                lot=rel_name(row.get("lot_id")),
+            )
+            for row in rows
+        ]
 
 
 def _to_material(row: dict) -> MaterialItem:

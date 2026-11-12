@@ -1,4 +1,4 @@
-"""Demo: read Odoo materials / users via ErpProviders."""
+"""Demo: read Odoo materials, locations, stock via ErpProviders."""
 
 from __future__ import annotations
 
@@ -19,17 +19,32 @@ def main() -> int:
         )
         return 1
 
-    print(f"Loaded: {', '.join(providers.names)}")
-    print()
-    print("=== Materials (first 10) ===")
+    print(f"Loaded: {', '.join(providers.names)}", flush=True)
+    print(flush=True)
+    print("=== Materials (first 10) ===", flush=True)
+    print("(fetching from Odoo…)", flush=True)
     for i, item in enumerate(providers.read_materials(limit=10), start=1):
         code = item.code or "-"
-        print(f"{i:2}. [{item.provider}] {code}  {item.name}  uom={item.uom or '-'}  qty={item.qty_available}")
+        print(
+            f"{i:2}. [{item.provider}] {code}  {item.name}  uom={item.uom or '-'}",
+            flush=True,
+        )
 
-    print()
-    print("=== Users (first 5) ===")
-    for i, item in enumerate(providers.read_users(limit=5), start=1):
-        print(f"{i:2}. [{item.provider}] {item.name}  {item.email or item.login}")
+    print(flush=True)
+    print("=== Locations (internal) ===", flush=True)
+    print("(fetching from Odoo…)", flush=True)
+    locations = providers.read_locations(limit=20)
+    for i, loc in enumerate(locations, start=1):
+        print(f"{i:2}. [{loc.provider}] {loc.id}  {loc.complete_name or loc.name}", flush=True)
+
+    print(flush=True)
+    print("=== Stock quants (first 10, qty>0) ===", flush=True)
+    print("(fetching from Odoo…)", flush=True)
+    for i, q in enumerate(providers.read_stock_quants(limit=10), start=1):
+        print(
+            f"{i:2}. [{q.provider}] qty={q.quantity:g}  {q.product_name}  @ {q.location_name}",
+            flush=True,
+        )
 
     return 0
 

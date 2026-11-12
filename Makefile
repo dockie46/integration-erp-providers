@@ -15,3 +15,4 @@ test: init
 clean:
 	@rm -rf .venv .ruff_cache .pytest_cache
 	@find . -type d -name '__pycache__' -not -path './.git/*' -exec rm -rf {} + 2>/dev/null || true
+

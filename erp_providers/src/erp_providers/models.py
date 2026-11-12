@@ -80,6 +80,41 @@ class MaterialItem:
         return asdict(self)
 
 
+@dataclass(frozen=True, slots=True)
+class LocationItem:
+    """Stock location (Odoo ``stock.location``)."""
+
+    provider: str
+    id: str
+    name: str
+    complete_name: str = ""
+    usage: str = ""
+    barcode: str = ""
+    parent_id: str | None = None
+    company: str = ""
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class StockQuantItem:
+    """On-hand qty at a location (Odoo ``stock.quant``)."""
+
+    provider: str
+    id: str
+    product_id: str
+    location_id: str
+    product_name: str = ""
+    location_name: str = ""
+    quantity: float = 0.0
+    reserved_quantity: float = 0.0
+    lot: str = ""
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
 # Re-export helpers for adapters
 rel_id = _rel_id
 rel_name = _rel_name

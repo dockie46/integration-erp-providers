@@ -5,7 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol
 
-from .models import MaterialItem, PartnerItem, ProjectItem, UserItem
+from .models import (
+    LocationItem,
+    MaterialItem,
+    PartnerItem,
+    ProjectItem,
+    StockQuantItem,
+    UserItem,
+)
 
 
 class ErpProvider(Protocol):
@@ -21,6 +28,16 @@ class ErpProvider(Protocol):
     def read_materials(self, limit: int | None = None) -> list[MaterialItem]: ...
 
     def search_materials(self, query: str, *, limit: int = 20) -> list[MaterialItem]: ...
+
+    def read_locations(self, limit: int | None = None) -> list[LocationItem]: ...
+
+    def read_stock_quants(
+        self,
+        *,
+        location_id: str | None = None,
+        product_id: str | None = None,
+        limit: int | None = None,
+    ) -> list[StockQuantItem]: ...
 
 
 class ErpProviderType(Protocol):
